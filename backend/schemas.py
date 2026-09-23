@@ -74,6 +74,8 @@ class GroundingResult(BaseModel):
     answer: str
     element_id: str | None = None
     bbox: BoundingBox | None = None
+    element_ids: list[str] = []
+    bboxes: list[BoundingBox] = []
     confidence: float = Field(ge=0, le=1)
     evidence: list[str] = []
     provider: str = "local_grounding_baseline"
