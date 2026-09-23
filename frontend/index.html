@@ -28,6 +28,11 @@
       </div>
       <aside class="analysis"><div class="analysis-head"><div><p class="eyebrow">SCREEN REPRESENTATION</p><h2>Analysis</h2></div><button id="delete-btn" class="icon-button" title="Delete screenshot">⌫</button></div><div class="screen-type"><span class="type-dot"></span><div><small>SCREEN TYPE</small><strong id="screen-type">Unknown interface</strong></div><span class="badge">PHASE 1</span></div><p id="description" class="description">Awaiting analysis.</p><div class="metrics"><div><b id="element-count">—</b><span>elements</span></div><div><b id="interactive-count">—</b><span>interactive</span></div><div><b id="ocr-count">—</b><span>OCR regions</span></div></div><div class="panel-section"><div class="panel-title"><span>ELEMENTS</span><span id="element-filter-label">ALL</span></div><div id="element-list" class="element-list"><div class="empty">Upload a screenshot to begin.</div></div></div><div class="panel-section"><div class="panel-title"><span>PIPELINE</span><span id="total-latency">—</span></div><div id="pipeline-list" class="pipeline-list"></div></div><button id="json-btn" class="button ghost">View raw JSON <span>↗</span></button></aside>
     </section>
+    <section id="qa-panel" class="qa-panel hidden">
+      <div class="section-head"><div><p class="eyebrow">PHASE 2 / VISUAL GROUNDING</p><h2>Ask about this screen</h2></div><span class="qa-local">LOCAL RETRIEVAL · NO VLM</span></div>
+      <div class="question-row"><input id="question-input" placeholder="Where do I log in?" maxlength="500" /><button id="ask-btn" class="button primary">Ask question <span>↗</span></button></div>
+      <div id="answer-card" class="answer-card hidden"><div class="answer-kicker">GROUNDED ANSWER <span id="answer-confidence">—</span></div><p id="answer-text">—</p><div class="answer-evidence" id="answer-evidence"></div></div>
+    </section>
     </main>
     <footer><span>SCREEN UNDERSTANDING AGENT</span><span>Built for transparent ML experiments <b>·</b> No external API calls</span></footer>
   </div>

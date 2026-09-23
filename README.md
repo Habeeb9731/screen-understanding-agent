@@ -31,6 +31,7 @@ Open http://127.0.0.1:8000 and upload a PNG, JPG, or WEBP screenshot.
 - `GET /api/screens/{id}` — return the structured representation.
 - `GET /api/screens/{id}/image` — serve the original screenshot.
 - `GET /api/health` — report configured providers.
+- `POST /api/screens/{id}/query` — ground a natural-language question to an existing element.
 
 ## Current limitations
 
@@ -38,6 +39,14 @@ The baseline detector is classical computer vision, not a trained UI detector. T
 
 ## Phase 2
 
-Add a replaceable grounding interface and `/api/screens/{id}/query`, then compare detector + OCR grounding against a vision-language baseline. After that, add annotation export and a benchmark harness for IoU, OCR error rates, and latency.
+Phase 2 now includes a local grounding baseline and question panel. It scores existing detected elements using visible OCR text, element type, interactive state, action affordances, and intent synonyms. It never invents coordinates. A VLM-based provider can be compared against this baseline later.
+
+Example query:
+
+```json
+{"question":"Which button completes the purchase?"}
+```
+
+The response includes `answer`, `element_id`, normalized `bbox`, confidence, and evidence.
 
 Provider interfaces live under `backend/services/providers.py`; schemas are in `backend/schemas.py`; geometry utilities are in `backend/core/geometry.py`.

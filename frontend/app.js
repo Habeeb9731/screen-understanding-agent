@@ -40,7 +40,7 @@ $('#analyze-btn').onclick = async () => {
     $('#screen-image').src = `/api/screens/${screenId}/image`;
     $('#canvas-loading').classList.remove('hidden'); button.innerHTML = 'Analyzing…';
     analysis = await fetch(`/api/screens/${screenId}/analyze`, { method: 'POST' }).then(readResponse);
-    renderAnalysis();
+    renderAnalysis(); $('#qa-panel').classList.remove('hidden');
   } catch (error) { showToast(error.message); } finally { button.disabled = false; button.innerHTML = 'Analyze screen <span>↗</span>'; $('#canvas-loading').classList.add('hidden'); }
 };
 
@@ -83,3 +83,16 @@ function escapeHtml(value) { return value.replace(/[&<>'"]/g, c => ({'&':'&amp;'
 document.querySelectorAll('.tool').forEach(tool => tool.onclick = () => { document.querySelectorAll('.tool').forEach(t => t.classList.remove('active')); tool.classList.add('active'); activeFilter = tool.dataset.filter; if (analysis) { renderBoxes(); renderElements(); } });
 $('#json-btn').onclick = () => { if (!analysis) return; const blob = new Blob([JSON.stringify(analysis, null, 2)], {type:'application/json'}); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${analysis.screen_id}-representation.json`; link.click(); URL.revokeObjectURL(link.href); };
 $('#delete-btn').onclick = async () => { if (!screenId) return; await fetch(`/api/screens/${screenId}`, {method:'DELETE'}); location.reload(); };
+$('#ask-btn').onclick = askQuestion;
+$('#question-input').onkeydown = event => { if (event.key === 'Enter') askQuestion(); };
+async function askQuestion() {
+  const question = $('#question-input').value.trim();
+  if (!question || !screenId) return;
+  const button = $('#ask-btn'); button.disabled = true; button.textContent = 'Grounding…';
+  try {
+    const result = await fetch(`/api/screens/${screenId}/query`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question})}).then(readResponse);
+    $('#answer-card').classList.remove('hidden'); $('#answer-text').textContent = result.answer; $('#answer-confidence').textContent = `${Math.round(result.confidence*100)}% confidence`;
+    $('#answer-evidence').textContent = result.evidence.join(' · ');
+    if (result.element_id) { selectedId = result.element_id; renderBoxes(); renderElements(); document.getElementById('overlay').scrollIntoView({behavior:'smooth', block:'center'}); }
+  } catch (error) { showToast(error.message); } finally { button.disabled = false; button.innerHTML = 'Ask question <span>↗</span>'; }
+}

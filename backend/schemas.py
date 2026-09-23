@@ -64,3 +64,16 @@ class ScreenRepresentation(BaseModel):
     pipeline: list[PipelineStage] = []
     providers: dict[str, str] = {}
     analyzed_at: str | None = None
+
+
+class QueryRequest(BaseModel):
+    question: str = Field(min_length=2, max_length=500)
+
+
+class GroundingResult(BaseModel):
+    answer: str
+    element_id: str | None = None
+    bbox: BoundingBox | None = None
+    confidence: float = Field(ge=0, le=1)
+    evidence: list[str] = []
+    provider: str = "local_grounding_baseline"

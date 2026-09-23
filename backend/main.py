@@ -9,6 +9,8 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.services.pipeline import ScreenPipeline
+from backend.services.grounding import answer_query
+from backend.schemas import QueryRequest
 
 BASE = Path(__file__).resolve().parent.parent
 UPLOADS = BASE / "data" / "uploads"
@@ -61,6 +63,15 @@ def get_image(screen_id: str):
     if not screen:
         raise HTTPException(404, "Screen not found")
     return FileResponse(screen["path"])
+
+@app.post("/api/screens/{screen_id}/query")
+def query_screen(screen_id: str, request: QueryRequest):
+    screen = DB.get(screen_id)
+    if not screen:
+        raise HTTPException(404, "Screen not found")
+    if screen["analysis"] is None:
+        screen["analysis"] = pipeline.analyze(screen_id, screen["filename"], Path(screen["path"]))
+    return answer_query(screen["analysis"], request.question)
 
 @app.delete("/api/screens/{screen_id}")
 def delete_screen(screen_id: str):
