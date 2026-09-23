@@ -25,6 +25,7 @@ function selectFile(file) {
   $('#analyze-btn').dataset.file = 'ready'; window.selectedFile = file;
 }
 $('#choose-btn').onclick = () => $('#file-input').click();
+$('#hero-choose').onclick = () => $('#file-input').click();
 $('#file-input').onchange = e => selectFile(e.target.files[0]);
 const drop = $('#drop-zone');
 ['dragenter','dragover'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.style.borderColor = '#35bd7b'; }));
