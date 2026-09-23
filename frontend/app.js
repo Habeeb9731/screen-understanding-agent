@@ -36,7 +36,7 @@ $('#analyze-btn').onclick = async () => {
     try { upload = await fetch('/api/screens', { method: 'POST', body: data }).then(readResponse); }
     catch { hostedMode = true; screenId = `browser-${Date.now()}`; }
     if (!hostedMode) screenId = upload.screen_id;
-    $('#workspace').classList.remove('hidden'); $('#workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('#workspace').classList.remove('hidden'); document.body.classList.add('analysis-mode');
     $('#screen-image').src = hostedMode ? URL.createObjectURL(window.selectedFile) : `/api/screens/${screenId}/image`;
     $('#canvas-loading').classList.remove('hidden'); button.innerHTML = 'Analyzing…';
     analysis = hostedMode ? await browserAnalyze(window.selectedFile) : await fetch(`/api/screens/${screenId}/analyze`, { method: 'POST' }).then(readResponse);
