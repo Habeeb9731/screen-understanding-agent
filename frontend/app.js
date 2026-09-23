@@ -21,17 +21,11 @@ function selectFile(file) {
   if (!['image/png','image/jpeg','image/webp'].includes(file.type)) return showToast('Please choose a PNG, JPG, or WEBP screenshot.');
   $('#file-name').textContent = file.name;
   $('#file-size').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB · ready to analyze`;
-  $('#upload-card').classList.add('is-active');
-  $('#drop-zone').classList.add('hidden'); $('#selected-file').classList.remove('hidden');
+  $('#hero-drop-label').classList.add('hidden'); $('#hero-upload-help').classList.add('hidden'); $('#hero-choose').classList.add('hidden'); $('#hero-selected-file').classList.remove('hidden');
   $('#analyze-btn').dataset.file = 'ready'; window.selectedFile = file;
 }
-$('#choose-btn').onclick = () => $('#file-input').click();
 $('#hero-choose').onclick = () => $('#file-input').click();
 $('#file-input').onchange = e => selectFile(e.target.files[0]);
-const drop = $('#drop-zone');
-['dragenter','dragover'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.style.borderColor = '#35bd7b'; }));
-['dragleave','drop'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.style.borderColor = ''; }));
-drop.addEventListener('drop', e => selectFile(e.dataTransfer.files[0]));
 
 $('#analyze-btn').onclick = async () => {
   if (!window.selectedFile) return;
