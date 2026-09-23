@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screen Understanding Agent</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">◈</div><div><strong>Screen Understanding Agent</strong><span>Local vision pipeline · Phase 1</span></div></div>
+      <div class="status"><i></i><span id="provider-status">checking local providers</span></div>
+    </header>
+
+    <main>
+      <section class="hero"><div><p class="eyebrow">RESEARCH WORKBENCH / 001</p><h1>Make the interface<br><em>legible to machines.</em></h1><p class="intro">Upload a screenshot to inspect its visual structure, readable text, and candidate interactive regions. Every result stays local and is exposed as structured data.</p></div><div class="hero-note"><span>PIPELINE</span><b>CV → OCR → GRAPH</b><small>Provider outputs, confidence, and latency are visible by design.</small></div></section>
+
+    <section id="upload-card" class="upload-card">
+      <div id="drop-zone" class="drop-zone"><div class="upload-icon">↑</div><h2>Drop a screenshot here</h2><p>PNG, JPG, or WEBP · local-only processing</p><button id="choose-btn" class="button primary">Choose screenshot</button><input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" hidden /></div>
+      <div id="selected-file" class="selected-file hidden"><div class="file-symbol">▧</div><div><b id="file-name">screen.png</b><span id="file-size">Ready to analyze</span></div><button id="analyze-btn" class="button primary">Analyze screen <span>↗</span></button></div>
+    </section>
+
+    <section id="workspace" class="workspace hidden">
+      <div class="screen-column"><div class="section-head"><div><p class="eyebrow">VISUAL CANVAS</p><h2>Detected interface</h2></div><div class="canvas-tools"><button class="tool active" data-filter="all">All</button><button class="tool" data-filter="interactive">Interactive</button><button class="tool" data-filter="text">Text</button><button class="tool" data-filter="low">Low confidence</button></div></div>
+        <div class="canvas"><img id="screen-image" alt="Uploaded screenshot" /><div id="overlay"></div><div id="canvas-loading" class="canvas-loading hidden"><div class="spinner"></div><span>Running local inference…</span></div></div>
+        <div class="canvas-caption"><span><i class="legend interactive"></i>interactive</span><span><i class="legend region"></i>region</span><span><i class="legend text"></i>text association</span><span class="caption-right" id="canvas-dimensions">—</span></div>
+      </div>
+      <aside class="analysis"><div class="analysis-head"><div><p class="eyebrow">SCREEN REPRESENTATION</p><h2>Analysis</h2></div><button id="delete-btn" class="icon-button" title="Delete screenshot">⌫</button></div><div class="screen-type"><span class="type-dot"></span><div><small>SCREEN TYPE</small><strong id="screen-type">Unknown interface</strong></div><span class="badge">PHASE 1</span></div><p id="description" class="description">Awaiting analysis.</p><div class="metrics"><div><b id="element-count">—</b><span>elements</span></div><div><b id="interactive-count">—</b><span>interactive</span></div><div><b id="ocr-count">—</b><span>OCR regions</span></div></div><div class="panel-section"><div class="panel-title"><span>ELEMENTS</span><span id="element-filter-label">ALL</span></div><div id="element-list" class="element-list"><div class="empty">Upload a screenshot to begin.</div></div></div><div class="panel-section"><div class="panel-title"><span>PIPELINE</span><span id="total-latency">—</span></div><div id="pipeline-list" class="pipeline-list"></div></div><button id="json-btn" class="button ghost">View raw JSON <span>↗</span></button></aside>
+    </section>
+    </main>
+    <footer><span>SCREEN UNDERSTANDING AGENT</span><span>Built for transparent ML experiments <b>·</b> No external API calls</span></footer>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
