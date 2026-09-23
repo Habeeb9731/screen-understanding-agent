@@ -50,3 +50,9 @@ Example query:
 The response includes `answer`, `element_id`, normalized `bbox`, confidence, and evidence.
 
 Provider interfaces live under `backend/services/providers.py`; schemas are in `backend/schemas.py`; geometry utilities are in `backend/core/geometry.py`.
+
+## Cloudflare Pages demo
+
+The static frontend is also deployable to Cloudflare Pages. In hosted mode, if the FastAPI API is unavailable, the browser runs Tesseract.js OCR locally and uses a transparent text-affordance baseline for demonstration. The full OpenCV/Tesseract backend remains the recommended local/research mode.
+
+Live demo: https://screen-understanding-agent.pages.dev

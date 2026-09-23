@@ -4,6 +4,7 @@ let analysis = null;
 let activeFilter = 'all';
 let selectedId = null;
 let selectedIds = [];
+let hostedMode = false;
 
 async function boot() {
   try {
@@ -35,12 +36,14 @@ $('#analyze-btn').onclick = async () => {
   const button = $('#analyze-btn'); button.disabled = true; button.innerHTML = 'Uploading…';
   const data = new FormData(); data.append('file', window.selectedFile);
   try {
-    const upload = await fetch('/api/screens', { method: 'POST', body: data }).then(readResponse);
-    screenId = upload.screen_id;
+    let upload;
+    try { upload = await fetch('/api/screens', { method: 'POST', body: data }).then(readResponse); }
+    catch { hostedMode = true; screenId = `browser-${Date.now()}`; }
+    if (!hostedMode) screenId = upload.screen_id;
     $('#workspace').classList.remove('hidden'); $('#workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    $('#screen-image').src = `/api/screens/${screenId}/image`;
+    $('#screen-image').src = hostedMode ? URL.createObjectURL(window.selectedFile) : `/api/screens/${screenId}/image`;
     $('#canvas-loading').classList.remove('hidden'); button.innerHTML = 'Analyzing…';
-    analysis = await fetch(`/api/screens/${screenId}/analyze`, { method: 'POST' }).then(readResponse);
+    analysis = hostedMode ? await browserAnalyze(window.selectedFile) : await fetch(`/api/screens/${screenId}/analyze`, { method: 'POST' }).then(readResponse);
     renderAnalysis(); $('#qa-panel').classList.remove('hidden');
   } catch (error) { showToast(error.message); } finally { button.disabled = false; button.innerHTML = 'Analyze screen <span>↗</span>'; $('#canvas-loading').classList.add('hidden'); }
 };
@@ -91,9 +94,30 @@ async function askQuestion() {
   if (!question || !screenId) return;
   const button = $('#ask-btn'); button.disabled = true; button.textContent = 'Grounding…';
   try {
-    const result = await fetch(`/api/screens/${screenId}/query`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question})}).then(readResponse);
+    const result = hostedMode ? browserAnswer(analysis, question) : await fetch(`/api/screens/${screenId}/query`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question})}).then(readResponse);
     $('#answer-card').classList.remove('hidden'); $('#answer-text').textContent = result.answer; $('#answer-confidence').textContent = `${Math.round(result.confidence*100)}% confidence`;
     $('#answer-evidence').textContent = result.evidence.join(' · ');
     if (result.element_id) { selectedId = result.element_id; selectedIds = result.element_ids?.length ? result.element_ids : [result.element_id]; renderBoxes(); renderElements(); document.getElementById('overlay').scrollIntoView({behavior:'smooth', block:'center'}); }
   } catch (error) { showToast(error.message); } finally { button.disabled = false; button.innerHTML = 'Ask question <span>↗</span>'; }
+}
+
+async function browserAnalyze(file) {
+  if (!window.Tesseract) throw new Error('Browser OCR library failed to load. Refresh and try again.');
+  const result = await Tesseract.recognize(file, 'eng', { logger: message => { if (message.status === 'recognizing text') $('#provider-status').textContent = `browser OCR · ${Math.round((message.progress || 0)*100)}%`; } });
+  const image = await loadImage(file); const width = image.naturalWidth, height = image.naturalHeight;
+  const words = (result.data.words || []).filter(word => word.text.trim() && word.confidence > 15);
+  const textRegions = words.map(word => ({text: word.text.trim(), confidence: Math.max(0, Math.min(1, word.confidence / 100)), bbox: {x1: word.bbox.x0/width, y1: word.bbox.y0/height, x2: word.bbox.x1/width, y2: word.bbox.y1/height}}));
+  const actionWords = /log.?in|sign.?in|search|submit|checkout|buy|order|save|send|continue|next|back|close|menu|follow|post|add/i;
+  const elements = textRegions.map((region, index) => { const interactive = actionWords.test(region.text); return {id:`element_${String(index+1).padStart(3,'0')}`, type:interactive ? 'button' : 'text', bbox:region.bbox, confidence:Math.round((interactive ? Math.min(.86, region.confidence+.18) : region.confidence)*100)/100, text:region.text, interactive, state:interactive ? 'enabled' : 'unknown', possible_actions:interactive ? ['click'] : [], source:'browser_tesseract'}; });
+  $('#provider-status').textContent = 'browser OCR · local image processing';
+  return {screen_id:screenId, filename:file.name, width, height, screen_type:'unknown', description:'Browser-local OCR and text-affordance analysis. Use the local FastAPI mode for the OpenCV baseline.', elements, text_regions:textRegions, relationships:[], current_state:{interactive_elements:elements.filter(e=>e.interactive).length, ocr_regions:textRegions.length}, available_actions:['click','type','scroll'], pipeline:[{name:'Browser OCR',status:'complete',duration_ms:0,detail:'Tesseract.js in browser'},{name:'Text affordance detector',status:'complete',duration_ms:0,detail:'Action-label heuristic'}], providers:{detector:'browser_text_affordance',ocr:'tesseract.js'}};
+}
+function loadImage(file) { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = URL.createObjectURL(file); }); }
+function browserAnswer(screen, question) {
+  const tokens = question.toLowerCase().match(/[a-z0-9-]+/g) || [];
+  const typeQuery = tokens.includes('button') || tokens.includes('buttons');
+  const matches = typeQuery ? screen.elements.filter(element => element.type === 'button') : screen.elements.filter(element => tokens.some(token => element.text.toLowerCase().includes(token)));
+  if (!matches.length) return {answer:"I couldn't ground that question to readable text or an action label in this screenshot.", confidence:.25, evidence:['Browser-local grounding found no matching OCR region.'], element_ids:[], bboxes:[]};
+  const shown = matches.slice(0, 6).map(element => `“${element.text}”`).join(', ');
+  return {answer:typeQuery ? `Yes — I can see ${matches.length} button${matches.length === 1 ? '' : 's'}: ${shown}.` : `The closest readable match is “${matches[0].text}”.`, confidence:Math.min(.9, .55 + matches[0].confidence*.35), element_id:matches[0].id, bbox:matches[0].bbox, element_ids:matches.map(element=>element.id), bboxes:matches.map(element=>element.bbox), evidence:[`Matched ${matches.length} browser OCR element(s).` ]};
 }
