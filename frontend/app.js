@@ -5,13 +5,13 @@ let activeFilter = 'all';
 let selectedId = null;
 let selectedIds = [];
 let hostedMode = false;
+function setProviderStatus(text, color) { const status = $('#provider-status'); if (!status) return; status.textContent = text; if (color) status.style.color = color; }
 
 async function boot() {
   try {
     const health = await fetch('/api/health').then(r => r.json());
-    $('#provider-status').textContent = `local detector · ${health.providers.ocr === 'unavailable' ? 'OCR unavailable' : 'OCR ready'}`;
-    if (health.providers.ocr === 'unavailable') $('#provider-status').style.color = '#d88936';
-  } catch { $('#provider-status').textContent = 'backend unavailable'; }
+    setProviderStatus(`local detector · ${health.providers.ocr === 'unavailable' ? 'OCR unavailable' : 'OCR ready'}`, health.providers.ocr === 'unavailable' ? '#d88936' : undefined);
+  } catch { setProviderStatus('backend unavailable'); }
 }
 boot();
 
@@ -105,13 +105,13 @@ async function askQuestion() {
 
 async function browserAnalyze(file) {
   if (!window.Tesseract) throw new Error('Browser OCR library failed to load. Refresh and try again.');
-  const result = await Tesseract.recognize(file, 'eng', { logger: message => { if (message.status === 'recognizing text') $('#provider-status').textContent = `browser OCR · ${Math.round((message.progress || 0)*100)}%`; } });
+  const result = await Tesseract.recognize(file, 'eng', { logger: message => { if (message.status === 'recognizing text') setProviderStatus(`browser OCR · ${Math.round((message.progress || 0)*100)}%`); } });
   const image = await loadImage(file); const width = image.naturalWidth, height = image.naturalHeight;
   const words = (result.data.words || []).filter(word => word.text.trim() && word.confidence > 15);
   const textRegions = words.map(word => ({text: word.text.trim(), confidence: Math.max(0, Math.min(1, word.confidence / 100)), bbox: {x1: word.bbox.x0/width, y1: word.bbox.y0/height, x2: word.bbox.x1/width, y2: word.bbox.y1/height}}));
   const actionWords = /log.?in|sign.?in|search|submit|checkout|buy|order|save|send|continue|next|back|close|menu|follow|post|add/i;
   const elements = textRegions.map((region, index) => { const interactive = actionWords.test(region.text); return {id:`element_${String(index+1).padStart(3,'0')}`, type:interactive ? 'button' : 'text', bbox:region.bbox, confidence:Math.round((interactive ? Math.min(.86, region.confidence+.18) : region.confidence)*100)/100, text:region.text, interactive, state:interactive ? 'enabled' : 'unknown', possible_actions:interactive ? ['click'] : [], source:'browser_tesseract'}; });
-  $('#provider-status').textContent = 'browser OCR · local image processing';
+  setProviderStatus('browser OCR · local image processing');
   return {screen_id:screenId, filename:file.name, width, height, screen_type:'unknown', description:'Browser-local OCR and text-affordance analysis. Use the local FastAPI mode for the OpenCV baseline.', elements, text_regions:textRegions, relationships:[], current_state:{interactive_elements:elements.filter(e=>e.interactive).length, ocr_regions:textRegions.length}, available_actions:['click','type','scroll'], pipeline:[{name:'Browser OCR',status:'complete',duration_ms:0,detail:'Tesseract.js in browser'},{name:'Text affordance detector',status:'complete',duration_ms:0,detail:'Action-label heuristic'}], providers:{detector:'browser_text_affordance',ocr:'tesseract.js'}};
 }
 function loadImage(file) { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = URL.createObjectURL(file); }); }
