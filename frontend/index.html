@@ -19,7 +19,7 @@
       <section class="story" id="research"><div><p class="eyebrow">FROM PIXELS TO PURPOSE</p><h2>Ship more, understand<br><em>every state.</em></h2></div><p>Screen Understanding Agent makes graphical interfaces legible to machines—grounding visual evidence in structured, inspectable data.</p><div class="story-grid"><div><b>01</b><strong>Detect the interface</strong><span>Contours, layout regions, and OCR become normalized elements.</span></div><div><b>02</b><strong>Ground the intent</strong><span>Questions resolve to existing boxes—not invented coordinates.</span></div><div><b>03</b><strong>Study the failures</strong><span>Provider outputs, confidence, and latency stay visible.</span></div></div></section>
 
     <section id="upload-card" class="upload-card" data-section="how-it-works">
-      <div id="drop-zone" class="drop-zone"><div class="upload-icon">↑</div><h2>Drop a screenshot here</h2><p>PNG, JPG, or WEBP · local-only processing</p><button id="choose-btn" class="button primary">Choose screenshot</button><input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" hidden /></div>
+      <div id="drop-zone" class="drop-zone"><div class="upload-icon">↑</div><h2>Drop a screenshot here</h2><p>PNG, JPG, or WEBP · local-only processing</p><button id="choose-btn" class="button primary">Choose screenshot</button></div>
       <div id="selected-file" class="selected-file hidden"><div class="file-symbol">▧</div><div><b id="file-name">screen.png</b><span id="file-size">Ready to analyze</span></div><button id="analyze-btn" class="button primary">Analyze screen <span>↗</span></button></div>
     </section>
 
@@ -35,6 +35,7 @@
       <div class="question-row"><input id="question-input" placeholder="Where do I log in?" maxlength="500" /><button id="ask-btn" class="button primary">Ask question <span>↗</span></button></div>
       <div id="answer-card" class="answer-card hidden"><div class="answer-kicker">GROUNDED ANSWER <span id="answer-confidence">—</span></div><p id="answer-text">—</p><div class="answer-evidence" id="answer-evidence"></div></div>
     </section>
+    <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" hidden />
     </main>
     <footer><span>SCREEN UNDERSTANDING AGENT</span><span>Built for transparent ML experiments <b>·</b> No external API calls</span></footer>
   </div>
