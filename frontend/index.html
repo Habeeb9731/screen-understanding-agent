@@ -9,14 +9,17 @@
 <body>
   <div class="shell">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">◈</div><div><strong>Screen Understanding Agent</strong><span>Local vision pipeline · Phase 1</span></div></div>
-      <div class="status"><i></i><span id="provider-status">checking local providers</span></div>
+      <div class="brand"><div class="brand-mark">✣</div><div><strong>Screen Understand</strong><span>VISUAL INTELLIGENCE / 001</span></div></div>
+      <nav class="main-nav"><a href="#platform">Platform</a><a href="#research">Research</a><a href="#how-it-works">How it works</a></nav>
+      <div class="nav-actions"><a class="nav-link" href="https://github.com/Habeeb9731/screen-understanding-agent" target="_blank">GitHub ↗</a><a class="nav-cta" href="#upload-card">Try it now <span>↗</span></a></div>
     </header>
 
     <main>
-      <section class="hero"><div><p class="eyebrow">RESEARCH WORKBENCH / 001</p><h1>Make the interface<br><em>legible to machines.</em></h1><p class="intro">Upload a screenshot to inspect its visual structure, readable text, and candidate interactive regions. Every result stays local and is exposed as structured data.</p></div><div class="hero-note"><span>PIPELINE</span><b>CV → OCR → GRAPH</b><small>Provider outputs, confidence, and latency are visible by design.</small></div></section>
+      <section class="hero" id="platform"><div class="hero-copy"><div class="announcement"><span>New</span> Phase 2 visual grounding is live <b>→</b></div><p class="eyebrow">SCREEN UNDERSTANDING AGENT</p><h1>Teach machines<br>to <em>see the interface.</em></h1><p class="intro">A research-grade vision pipeline that finds what’s on screen, where it lives, and what a user can do next.</p><div class="hero-actions"><a class="hero-button" href="#upload-card">Analyze a screen <span>↗</span></a><a class="hero-text-link" href="#how-it-works">Explore the pipeline <span>↓</span></a></div></div><div class="hero-visual" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="dot-field"></div><div class="scan-line"></div><div class="floating-tag tag-top">OCR <b>98.4%</b></div><div class="floating-tag tag-bottom">ELEMENTS <b>31 detected</b></div><div class="screen-fragment"><div class="fragment-top"><i></i><i></i><i></i><span>checkout / live view</span></div><div class="fragment-lines"><b></b><b></b><b></b><b></b></div><div class="fragment-box"><span>button</span></div></div></div></section>
 
-    <section id="upload-card" class="upload-card">
+      <section class="story" id="research"><div><p class="eyebrow">FROM PIXELS TO PURPOSE</p><h2>Ship more, understand<br><em>every state.</em></h2></div><p>Screen Understanding Agent makes graphical interfaces legible to machines—grounding visual evidence in structured, inspectable data.</p><div class="story-grid"><div><b>01</b><strong>Detect the interface</strong><span>Contours, layout regions, and OCR become normalized elements.</span></div><div><b>02</b><strong>Ground the intent</strong><span>Questions resolve to existing boxes—not invented coordinates.</span></div><div><b>03</b><strong>Study the failures</strong><span>Provider outputs, confidence, and latency stay visible.</span></div></div></section>
+
+    <section id="upload-card" class="upload-card" data-section="how-it-works">
       <div id="drop-zone" class="drop-zone"><div class="upload-icon">↑</div><h2>Drop a screenshot here</h2><p>PNG, JPG, or WEBP · local-only processing</p><button id="choose-btn" class="button primary">Choose screenshot</button><input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" hidden /></div>
       <div id="selected-file" class="selected-file hidden"><div class="file-symbol">▧</div><div><b id="file-name">screen.png</b><span id="file-size">Ready to analyze</span></div><button id="analyze-btn" class="button primary">Analyze screen <span>↗</span></button></div>
     </section>
