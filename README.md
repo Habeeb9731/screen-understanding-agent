@@ -56,3 +56,5 @@ Provider interfaces live under `backend/services/providers.py`; schemas are in `
 The static frontend is also deployable to Cloudflare Pages. In hosted mode, if the FastAPI API is unavailable, the browser runs Tesseract.js OCR locally and uses a transparent text-affordance baseline for demonstration. The full OpenCV/Tesseract backend remains the recommended local/research mode.
 
 Live demo: https://screen-understanding-agent.pages.dev
+
+Custom domain path: https://abdulhabeeb.com/projects/screenunderstand/
