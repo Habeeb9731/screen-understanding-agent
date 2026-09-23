@@ -21,6 +21,7 @@ function selectFile(file) {
   if (!['image/png','image/jpeg','image/webp'].includes(file.type)) return showToast('Please choose a PNG, JPG, or WEBP screenshot.');
   $('#file-name').textContent = file.name;
   $('#file-size').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB · ready to analyze`;
+  $('#upload-card').classList.add('is-active');
   $('#drop-zone').classList.add('hidden'); $('#selected-file').classList.remove('hidden');
   $('#analyze-btn').dataset.file = 'ready'; window.selectedFile = file;
 }
